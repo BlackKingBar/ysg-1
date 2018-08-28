@@ -173,7 +173,7 @@ public class MyApplication extends Application {
             }
         });
 
-        mPushAgent.getTagManager().add(new TagManager.TCallBack() {
+        mPushAgent.getTagManager().addTags(new TagManager.TCallBack() {
             @Override
             public void onMessage(final boolean isSuccess, final ITagManager.Result result) {
                 if (isSuccess) {
@@ -184,15 +184,14 @@ public class MyApplication extends Application {
     }
 
     public void removeMessageTag(String ALIAS_TYPE, String alias, String[] tags) {
-
-        mPushAgent.removeAlias(alias, ALIAS_TYPE, new UTrack.ICallBack() {
+        mPushAgent.deleteAlias(alias, ALIAS_TYPE, new UTrack.ICallBack() {
             @Override
             public void onMessage(boolean isSuccess, String message) {
                 Log.e("", message);
             }
         });
 
-        mPushAgent.getTagManager().delete(new TagManager.TCallBack() {
+        mPushAgent.getTagManager().deleteTags(new TagManager.TCallBack() {
             @Override
             public void onMessage(final boolean isSuccess, final ITagManager.Result result) {
                 if (isSuccess) {
