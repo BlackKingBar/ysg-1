@@ -7,15 +7,49 @@ android {
         applicationId "com.ysg.yashige"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 6
-        versionName "1.0.2"
+        versionCode 7
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        setProperty("archivesBaseName", applicationId + "-v" + versionCode + "(" + versionName + ")" + "-" + getDate())
     }
+
+    def storePasswordStr = ''
+    def keyAliasStr = ''
+    def keyPasswordStr = ''
+
+    Properties properties = new Properties()
+// local.properties file in the root director
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    storePasswordStr = properties.getProperty("keystore.storePassword")
+    keyAliasStr = properties.getProperty("keystore.keyAlias")
+    keyPasswordStr = properties.getProperty("keystore.keyPassword")
+
+
+    signingConfigs {
+        release {
+            storeFile file("../ysg.jks")
+            storePassword storePasswordStr
+            keyAlias keyAliasStr
+            keyPassword keyPasswordStr
+        }
+
+        debug {
+            storeFile file("../ysg.jks")
+            storePassword storePasswordStr
+            keyAlias keyAliasStr
+            keyPassword keyPasswordStr
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            applicationIdSuffix '.debug'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -65,3 +99,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
 }
+
+
+def getDate() {
+    return new Date().format('yyyyMMdd')
+}
+
+
