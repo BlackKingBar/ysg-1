@@ -24,6 +24,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
 import com.ysg.yashige.base.C;
+import com.ysg.yashige.base.DataCacheRam;
 import com.ysg.yashige.base.MyApplication;
 import com.ysg.yashige.networks.commons.NetWorkManager;
 import com.ysg.yashige.networks.model.VersionModel;
@@ -109,6 +110,18 @@ public class MainActivity extends WebPageActivity {
         flag = false;
     }
 
+    @Override
+    public void onWebPageFinished(String url) {
+        super.onWebPageFinished(url);
+        if (DataCacheRam.firstOpen) {
+            DataCacheRam.firstOpen=false;
+            Message message = new Message();
+            message.what = 3;
+            handler.sendMessageDelayed(message,3000);
+        }
+
+    }
+
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -125,6 +138,10 @@ public class MainActivity extends WebPageActivity {
                 }
             } else if (msg.what == 2) {
                 webView.loadUrl(C.network.home_url + "/#/home/news/newDetail");
+            } else if (msg.what == 3) {
+                if (isWebView) {
+                    webView.loadUrl("javascript:startLogin()");
+                }
             }
             super.handleMessage(msg);
         }

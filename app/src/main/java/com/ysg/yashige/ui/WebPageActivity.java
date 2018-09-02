@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JsResult;
@@ -27,6 +28,7 @@ import com.ysg.yashige.base.BaseActivity;
 import com.ysg.yashige.base.C;
 import com.ysg.yashige.base.MyApplication;
 import com.ysg.yashige.utils.LoadingDialog;
+import com.ysg.yashige.utils.LogUtils;
 import com.ysg.yashige.utils.Toastutils;
 
 import java.io.File;
@@ -127,11 +129,19 @@ public abstract class WebPageActivity extends BaseActivity {
 
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
+                LogUtils.i("webview newProgress " + newProgress + view.getUrl());
+
                 if (newProgress == 100) {
                     LoadingDialog.getInstance(WebPageActivity.this).hideDialog();
                     openVuePage();
                 }
                 super.onProgressChanged(view, newProgress);
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                LogUtils.i("webview consolelog "+consoleMessage.message());
+                return super.onConsoleMessage(consoleMessage);
             }
         });
         webView.setWebViewClient(new WebViewClient() {
@@ -146,10 +156,21 @@ public abstract class WebPageActivity extends BaseActivity {
                 }
                 return true;
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                LogUtils.i(url);
+                onWebPageFinished(url);
+                super.onPageFinished(view, url);
+            }
         });
     }
 
     public void openVuePage() {
+
+    }
+
+    public void onWebPageFinished(String url){
 
     }
 
