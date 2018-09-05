@@ -117,7 +117,7 @@ public class MainActivity extends WebPageActivity {
             DataCacheRam.firstOpen=false;
             Message message = new Message();
             message.what = 3;
-            handler.sendMessageDelayed(message,3000);
+            handler.sendMessageDelayed(message,0);
         }
 
     }
