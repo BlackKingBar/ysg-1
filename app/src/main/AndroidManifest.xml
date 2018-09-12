@@ -1,5 +1,6 @@
 <?xml version="1.1" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.ysg.yashige">
 
     <!-- webView -->
@@ -70,19 +71,20 @@
         android:name=".base.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/appicon"
-        android:label="@string/app_name"
+        android:label="${appLabel}"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="label,allowBackup">
         <activity
             android:name=".ui.MainActivity"
             android:launchMode="singleInstance" />
 
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="594e4614734be4240f001013" />
+            android:value="${UMENG_APPKEY}" />
         <meta-data
             android:name="UMENG_MESSAGE_SECRET"
-            android:value="65fcb0ded026ee6faf93cb288ada787b" />
+            android:value="${UMENG_MESSAGE_SECRET}" />
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="Channel ID" />

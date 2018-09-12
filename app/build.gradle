@@ -4,13 +4,12 @@ android {
     compileSdkVersion 24
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.ysg.yashige"
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 7
         versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", applicationId + "-v" + versionCode + "(" + versionName + ")" + "-" + getDate())
+        setProperty("archivesBaseName", "-v" + versionCode + "(" + versionName + ")" + "-" + getDate())
     }
 
     def storePasswordStr = ''
@@ -52,6 +51,27 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    productFlavors {
+        Ascott {
+            applicationId "com.ysg.yashige"
+            def appLabel = "Ascott iServices"
+            manifestPlaceholders = [appLabel: appLabel]
+            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+        }
+
+        城市宾馆 {
+            applicationId "com.ysg.yashigemacao"
+            def appLabel = "城市宾馆"
+            manifestPlaceholders = [appLabel: appLabel]
+            manifestPlaceholders.put("UMENG_APPKEY", "5b928a5df43e48431600049e")
+            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "845cd3c4fbe247d2e8ef978aca89baac")
+        }
+    }
+
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -64,6 +84,15 @@ android {
         into "lib"
     }
 }
+
+/*android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        logger.error('An error log message.' + variant.properties.ManifestPlaceholders)
+        println 'A message which is logged at QUIET level'
+        def file = output.outputFile
+        output.outputFile = new File(file.parent, file.name.replace(".apk", "-" + variant.versionName + ".apk"))
+    }
+}*/
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -94,6 +123,7 @@ dependencies {
     compile 'com.umeng.sdk:common:1.5.3'
     //PushSDK必须依赖utdid库，所以需要加入对应依赖
     compile 'com.umeng.sdk:utdid:1.1.5.3'
+    compile group: 'com.tencent.mm.opensdk', name: 'wechat-sdk-android-with-mta', version: '5.1.4'
     //PushSDK
     compile 'com.umeng.sdk:push:4.2.0'
     testCompile 'junit:junit:4.12'
