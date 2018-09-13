@@ -23,9 +23,13 @@ import com.alibaba.fastjson.JSON;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationListener;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.ysg.yashige.base.C;
 import com.ysg.yashige.base.DataCacheRam;
 import com.ysg.yashige.base.MyApplication;
+import com.ysg.yashige.bean.JSBridgeMiniProgramParamBean;
 import com.ysg.yashige.networks.commons.NetWorkManager;
 import com.ysg.yashige.networks.model.VersionModel;
 import com.ysg.yashige.utils.CheckVersionUtil;
@@ -296,6 +300,12 @@ public class MainActivity extends WebPageActivity {
         }
 
         @JavascriptInterface
+        public void launchMiniProgramme(String paramsJson) {
+            Log.e(TAG, "launchMiniProgramme paramsJson " + paramsJson);
+            goLaunchMiniProgramme(paramsJson);
+        }
+
+        @JavascriptInterface
         public void openVideo(String url) {
             JumpItent.jump(MainActivity.this, VideoActivity.class, "videoUrl", url);
         }
@@ -388,6 +398,28 @@ public class MainActivity extends WebPageActivity {
                 });
             }
         });
+    }
+
+
+    private void goLaunchMiniProgramme(String paramsJson){
+        JSBridgeMiniProgramParamBean jsBridgeMiniProgramParamBean = JSON.parseObject(paramsJson, JSBridgeMiniProgramParamBean.class);
+        if (jsBridgeMiniProgramParamBean != null) {
+
+            String appId = "wxc2f85423d76df486"; // 填应用AppId
+            IWXAPI api = WXAPIFactory.createWXAPI(getApplicationContext(), appId);
+            WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+            req.userName = "gh_ed26ff61e540"; // 填小程序原始id
+            String storeId = jsBridgeMiniProgramParamBean.storeId;
+            String roomId = jsBridgeMiniProgramParamBean.roomId;
+            String date = jsBridgeMiniProgramParamBean.date;
+            String name = jsBridgeMiniProgramParamBean.name;
+            String verifyCode = jsBridgeMiniProgramParamBean.verifyCode;
+            req.path = "pages/index/index?storeId=" + storeId + "&roomId=" + roomId + "&name=" + name + "&date=" + date + "&verifyCode=" + verifyCode;
+            //拉起小程序页面的可带参路径，不填默认拉起小程序首页
+            req.miniprogramType = WXLaunchMiniProgram.Req.MINIPTOGRAM_TYPE_RELEASE;// 可选打开 开发版，体验版和正式版
+            api.sendReq(req);
+        }
+
     }
 
     private static View getRootView(Activity context) {
