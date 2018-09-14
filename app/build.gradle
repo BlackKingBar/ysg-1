@@ -9,9 +9,9 @@ android {
         versionCode 7
         versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", "-v" + versionCode + "(" + versionName + ")" + "-" + getDate())
     }
 
+    def fileprovider_authorities=''
     def storePasswordStr = ''
     def keyAliasStr = ''
     def keyPasswordStr = ''
@@ -49,24 +49,63 @@ android {
 
         debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
         }
     }
 
     productFlavors {
-        Ascott {
-            applicationId "com.ysg.yashige"
+
+        iService快捷酒店 {
+            applicationId "com.itearoa.shanshui"
             def appLabel = "Ascott iServices"
             manifestPlaceholders = [appLabel: appLabel]
+            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+
+            fileprovider_authorities = applicationId + ".fileprovider";
+            logger.error("fileprovider_authorities  1 " +fileprovider_authorities )
+        }
+
+        AscottiSevices {
+            applicationId "com.ysg.yashige"
+            buildTypes.each { buildType ->
+                logger.error(buildType.name);
+                logger.error("debug" + "debug".equalsIgnoreCase(buildType.name));
+                logger.error("release" + "release".equalsIgnoreCase(buildType.name));
+                if ("debug".equalsIgnoreCase(buildType.name)) {
+                    def appLabel = "Ascott测试"
+                    manifestPlaceholders = [appLabel: appLabel]
+                    fileprovider_authorities = "com.ysg.yashige.debug.fileprovider" + ".fileprovider"
+                } else if("release".equalsIgnoreCase(buildType.name)){
+                    def appLabel = "Ascott iServices"
+                    manifestPlaceholders = [appLabel: appLabel]
+                    fileprovider_authorities = "me.ysg.fileprovider" + ".fileprovider"
+                    logger.error("fileprovider_authorities  1 " +fileprovider_authorities );
+                }
+            }
             manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
             manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
         }
 
         城市宾馆 {
+            logger.error("productFlavors 城市宾馆");
             applicationId "com.ysg.yashigemacao"
             def appLabel = "城市宾馆"
             manifestPlaceholders = [appLabel: appLabel]
-            manifestPlaceholders.put("UMENG_APPKEY", "5b928a5df43e48431600049e")
-            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "845cd3c4fbe247d2e8ef978aca89baac")
+            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+            manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+
+            fileprovider_authorities = applicationId + ".fileprovider"
+            logger.error("fileprovider_authorities  3 " +fileprovider_authorities );
+        }
+
+
+        //注意我注释掉的，可以去掉注释，那样的话，下面这句就可以不用了
+        productFlavors.all{flavor ->
+            buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+            manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", fileprovider_authorities)
+            logger.error("###############flavor123");
         }
     }
 
@@ -85,14 +124,28 @@ android {
     }
 }
 
-/*android.applicationVariants.all { variant ->
+android.applicationVariants.all { variant ->
     variant.outputs.each { output ->
-        logger.error('An error log message.' + variant.properties.ManifestPlaceholders)
-        println 'A message which is logged at QUIET level'
-        def file = output.outputFile
-        output.outputFile = new File(file.parent, file.name.replace(".apk", "-" + variant.versionName + ".apk"))
+        // 获取渠道
+        def flavor = variant.productFlavors[0]
+        def flavorName
+        if (flavor == null) {
+            flavorName = "defaultName"
+        } else {
+            flavorName = flavor.name
+        }
+        def outputFile = output.outputFile
+        def fileName
+
+        if (outputFile != null && outputFile.name.endsWith('.apk')) {
+            fileName = "${flavorName}-${variant.applicationId}-${variant.buildType.name}-v${variant.versionName}(${variant.versionCode}).apk";
+            println fileName
+            output.outputFile = new File(outputFile.parent, fileName)
+        }
     }
-}*/
+
+}
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')

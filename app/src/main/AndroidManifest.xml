@@ -115,7 +115,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="me.ysg.fileprovider"
+            android:authorities="${FILEPROVIDER_AUTHORITIES}"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

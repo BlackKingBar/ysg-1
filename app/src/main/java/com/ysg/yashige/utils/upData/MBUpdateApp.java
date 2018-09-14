@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.FileProvider;
 
+import com.ysg.yashige.BuildConfig;
 import com.ysg.yashige.R;
 import com.ysg.yashige.utils.upData.DownLoadFile.MBDownLoadManager;
 
@@ -58,8 +59,10 @@ public class MBUpdateApp {
         if (!file.getParentFile().exists())file.getParentFile().mkdirs();
         if (Build.VERSION.SDK_INT >= 24){
             i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
-            apkUri =
-                    FileProvider.getUriForFile(context, "me.ysg.fileprovider", file);
+//            apkUri = FileProvider.getUriForFile(context, "me.ysg.fileprovider", file);
+            apkUri = FileProvider.getUriForFile(context, BuildConfig.FILEPROVIDER_AUTHORITIES, file);
+
+
         }else {
             if (!file.exists()) {
                 return;
