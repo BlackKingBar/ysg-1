@@ -35,6 +35,7 @@ import com.ysg.yashige.networks.model.VersionModel;
 import com.ysg.yashige.utils.CheckVersionUtil;
 import com.ysg.yashige.utils.JumpItent;
 import com.ysg.yashige.utils.KeyBoardListener;
+import com.ysg.yashige.utils.LogUtils;
 import com.ysg.yashige.utils.SharePreUtil;
 import com.ysg.yashige.utils.Toastutils;
 import com.ysg.yashige.utils.UpdateVersionManager;
@@ -197,9 +198,10 @@ public class MainActivity extends WebPageActivity {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onLocationChanged(AMapLocation aMapLocation) {
-
+                LogUtils.i("onLocationChanged " + aMapLocation);
                 if (aMapLocation != null) {
                     if (aMapLocation.getErrorCode() == 0) {
+                        LogUtils.w("定位成功");
                         mLocationClient.stopLocation();
                         lat = String.format("%.4f", aMapLocation.getLatitude());
                         lng = String.format("%.4f", aMapLocation.getLongitude());

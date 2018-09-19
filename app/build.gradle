@@ -76,16 +76,19 @@ android {
                 switch (variant.flavorName) {
                     case "iService快捷酒店":
                         def fileprovider_authorities = ""
+                        def amap_apikey = ""
                         switch (variant.buildType.name) {
                             case "debug":
                                 def appLabel = "Ascott测试"
                                 mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
                                 fileprovider_authorities = variant.applicationId+".provider"
+                                amap_apikey = "65fcb0ded026ee6faf93cb288ada787b";
                                 break
                             case "release":
                                 def appLabel = "Ascott iServices"
                                 mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
                                 fileprovider_authorities = variant.applicationId+".provider"
+                                amap_apikey = "b6ac91a0fc509b3d354109a04afcb793";
                                 break
                             default:
                                 break
@@ -93,6 +96,7 @@ android {
                         logger.error("iservice fileprovider "+fileprovider_authorities);
                         mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
                         mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("AMAP_APIKEY", amap_apikey)
                         mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
                         buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
                         break

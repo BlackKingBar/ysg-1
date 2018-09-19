@@ -13,9 +13,9 @@ public class LogUtils {
     public static boolean showV = DEBUG;
     public static boolean showD = DEBUG;
     public static boolean showI = DEBUG;
-    public static boolean showW = DEBUG;
-    public static boolean showE = DEBUG;
-    public static boolean showWTF = DEBUG;
+    public static boolean showW = true;
+    public static boolean showE = true;
+    public static boolean showWTF = true;
 
     /**
      * 得到tag（所在类.方法（L:行））
