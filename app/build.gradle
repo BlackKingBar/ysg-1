@@ -101,7 +101,7 @@ android {
                         buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
                         break
                     case "AscottiSevices":
-
+                        def amap_apikey = "c7320598fe3ea6974d0677da438b8ca8";
                         def appLabel="";
                         def fileprovider_authorities = ""
                         switch (variant.buildType.name) {
@@ -121,6 +121,7 @@ android {
                         mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
                         mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
                         mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("AMAP_APIKEY", amap_apikey)
                         mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
                         buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
                         break
