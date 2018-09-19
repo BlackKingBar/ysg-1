@@ -11,7 +11,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    def fileprovider_authorities=''
     def storePasswordStr = ''
     def keyAliasStr = ''
     def keyPasswordStr = ''
@@ -57,55 +56,95 @@ android {
 
         iService快捷酒店 {
             applicationId "com.itearoa.shanshui"
-            def appLabel = "Ascott iServices"
-            manifestPlaceholders = [appLabel: appLabel]
-            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
-            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
 
-            fileprovider_authorities = applicationId + ".fileprovider";
-            logger.error("fileprovider_authorities  1 " +fileprovider_authorities )
         }
 
         AscottiSevices {
             applicationId "com.ysg.yashige"
-            buildTypes.each { buildType ->
-                logger.error(buildType.name);
-                logger.error("debug" + "debug".equalsIgnoreCase(buildType.name));
-                logger.error("release" + "release".equalsIgnoreCase(buildType.name));
-                if ("debug".equalsIgnoreCase(buildType.name)) {
-                    def appLabel = "Ascott测试"
-                    manifestPlaceholders = [appLabel: appLabel]
-                    fileprovider_authorities = "com.ysg.yashige.debug.fileprovider" + ".fileprovider"
-                } else if("release".equalsIgnoreCase(buildType.name)){
-                    def appLabel = "Ascott iServices"
-                    manifestPlaceholders = [appLabel: appLabel]
-                    fileprovider_authorities = "me.ysg.fileprovider" + ".fileprovider"
-                    logger.error("fileprovider_authorities  1 " +fileprovider_authorities );
-                }
-            }
-            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
-            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+            manifestPlaceholders = [appLabel: "Ascott11"]
         }
 
         城市宾馆 {
-            logger.error("productFlavors 城市宾馆");
             applicationId "com.ysg.yashigemacao"
-            def appLabel = "城市宾馆"
-            manifestPlaceholders = [appLabel: appLabel]
-            manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
-            manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
-            manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
-
-            fileprovider_authorities = applicationId + ".fileprovider"
-            logger.error("fileprovider_authorities  3 " +fileprovider_authorities );
         }
 
+        productFlavors.all { flavor ->
+            applicationVariants.all { variant ->
+                //获取ProductFlavor
+                def mergedFlavor = variant.mergedFlavor
+                //动态给每一种变体设置不同的appkey
+                switch (variant.flavorName) {
+                    case "iService快捷酒店":
+                        def fileprovider_authorities = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                def appLabel = "Ascott测试"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                break
+                            case "release":
+                                def appLabel = "Ascott iServices"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                break
+                            default:
+                                break
+                        }
+                        logger.error("iservice fileprovider "+fileprovider_authorities);
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+                    case "AscottiSevices":
 
-        //注意我注释掉的，可以去掉注释，那样的话，下面这句就可以不用了
-        productFlavors.all{flavor ->
-            buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
-            manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", fileprovider_authorities)
-            logger.error("###############flavor123");
+                        def appLabel="";
+                        def fileprovider_authorities = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                appLabel = "Ascott测试"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = "com.ysg.yashige.debug.fileprovider" + ".fileprovider"
+                                break
+                            case "release":
+                                fileprovider_authorities = "me.ysg.fileprovider" + ".fileprovider"
+                                appLabel = "Ascott iServices"
+                                break
+                            default:
+                                break
+                        }
+                        logger.error("iservice fileprovider "+fileprovider_authorities);
+                        mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+
+                    case "城市宾馆":
+                        def appLabel = "城市宾馆"
+                        def fileprovider_authorities = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                appLabel="城市宾馆debug";
+                                fileprovider_authorities = variant.applicationId+".debug.provider"
+                                break
+                            case "release":
+                                appLabel="城市宾馆";
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                break
+                            default:
+                                break
+                        }
+
+                        mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+                }
+            }
         }
     }
 
