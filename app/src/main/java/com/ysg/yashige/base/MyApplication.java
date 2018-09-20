@@ -52,6 +52,7 @@ public class MyApplication extends Application {
         instance = this;
 
         mPushAgent = PushAgent.getInstance(this);
+        mPushAgent.setResourcePackageName("com.ysg.yashige");
         mPushAgent.register(new IUmengRegisterCallback() {
 
             @Override
