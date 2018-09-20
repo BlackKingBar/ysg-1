@@ -82,7 +82,7 @@ android {
                                 def appLabel = "Ascott测试"
                                 mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
                                 fileprovider_authorities = variant.applicationId+".provider"
-                                amap_apikey = "65fcb0ded026ee6faf93cb288ada787b";
+                                amap_apikey = "1df1320d44aa62627f32c51f26c4ed34";
                                 break
                             case "release":
                                 def appLabel = "Ascott iServices"
