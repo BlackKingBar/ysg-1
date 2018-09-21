@@ -1,0 +1,235 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+android {
+    compileSdkVersion 24
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 22
+        versionCode 8
+        versionName "1.0.4"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    def storePasswordStr = ''
+    def keyAliasStr = ''
+    def keyPasswordStr = ''
+
+    Properties properties = new Properties()
+// local.properties file in the root director
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    storePasswordStr = properties.getProperty("keystore.storePassword")
+    keyAliasStr = properties.getProperty("keystore.keyAlias")
+    keyPasswordStr = properties.getProperty("keystore.keyPassword")
+
+
+    signingConfigs {
+        release {
+            storeFile file("../ysg.jks")
+            storePassword storePasswordStr
+            keyAlias keyAliasStr
+            keyPassword keyPasswordStr
+        }
+
+        debug {
+            storeFile file("../ysg.jks")
+            storePassword storePasswordStr
+            keyAlias keyAliasStr
+            keyPassword keyPasswordStr
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+        }
+    }
+
+    productFlavors {
+
+        iService快捷酒店 {
+            applicationId "com.itearoa.shanshui"
+
+        }
+
+        AscottiSevices {
+            applicationId "com.ysg.yashige"
+            manifestPlaceholders = [appLabel: "Ascott11"]
+        }
+
+        城市宾馆 {
+            applicationId "com.ysg.yashigemacao"
+        }
+
+        productFlavors.all { flavor ->
+            applicationVariants.all { variant ->
+                //获取ProductFlavor
+                def mergedFlavor = variant.mergedFlavor
+                //动态给每一种变体设置不同的appkey
+                switch (variant.flavorName) {
+                    case "iService快捷酒店":
+                        def fileprovider_authorities = ""
+                        def amap_apikey = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                def appLabel = "Ascott测试"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                amap_apikey = "1df1320d44aa62627f32c51f26c4ed34";
+                                break
+                            case "release":
+                                def appLabel = "Ascott iServices"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                amap_apikey = "b6ac91a0fc509b3d354109a04afcb793";
+                                break
+                            default:
+                                break
+                        }
+                        logger.error("iservice fileprovider "+fileprovider_authorities);
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("AMAP_APIKEY", amap_apikey)
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+                    case "AscottiSevices":
+                        def amap_apikey = "c7320598fe3ea6974d0677da438b8ca8";
+                        def appLabel="";
+                        def fileprovider_authorities = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                appLabel = "Ascott测试"
+                                mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                                fileprovider_authorities = "com.ysg.yashige.debug.fileprovider" + ".fileprovider"
+                                break
+                            case "release":
+                                fileprovider_authorities = "me.ysg.fileprovider" + ".fileprovider"
+                                appLabel = "Ascott iServices"
+                                break
+                            default:
+                                break
+                        }
+                        logger.error("iservice fileprovider "+fileprovider_authorities);
+                        mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("AMAP_APIKEY", amap_apikey)
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+
+                    case "城市宾馆":
+                        def appLabel = "城市宾馆"
+                        def fileprovider_authorities = ""
+                        switch (variant.buildType.name) {
+                            case "debug":
+                                appLabel="城市宾馆debug";
+                                fileprovider_authorities = variant.applicationId+".debug.provider"
+                                break
+                            case "release":
+                                appLabel="城市宾馆";
+                                fileprovider_authorities = variant.applicationId+".provider"
+                                break
+                            default:
+                                break
+                        }
+
+                        mergedFlavor.manifestPlaceholders = [appLabel: appLabel]
+                        mergedFlavor.manifestPlaceholders.put("UMENG_APPKEY", "594e4614734be4240f001013")
+                        mergedFlavor.manifestPlaceholders.put("UMENG_MESSAGE_SECRET", "65fcb0ded026ee6faf93cb288ada787b")
+                        mergedFlavor.manifestPlaceholders.put("FILEPROVIDER_AUTHORITIES", applicationId + ".fileprovider")
+                        buildConfigField "String", "FILEPROVIDER_AUTHORITIES", "\"" + fileprovider_authorities + "\""
+                        break
+                }
+            }
+        }
+    }
+
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    task nativeLibsToJar(type: Zip, description: "create a jar archive of the native libs") {
+        destinationDir file("$projectDir/libs")
+        baseName "Native_Libs2"
+        extension "jar"
+        from fileTree(dir: "libs", include: "**/*.so")
+        into "lib"
+    }
+}
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        // 获取渠道
+        def flavor = variant.productFlavors[0]
+        def flavorName
+        if (flavor == null) {
+            flavorName = "defaultName"
+        } else {
+            flavorName = flavor.name
+        }
+        def outputFile = output.outputFile
+        def fileName
+
+        if (outputFile != null && outputFile.name.endsWith('.apk')) {
+            fileName = "${flavorName}-${variant.applicationId}-${variant.buildType.name}-v${variant.versionName}(${variant.versionCode}).apk";
+            println fileName
+            output.outputFile = new File(outputFile.parent, fileName)
+        }
+    }
+
+}
+
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile files('libs/AMap_Location_V3.4.0_20170427.jar')
+    compile 'com.lovedise:permissiongen:0.0.6'
+    compile files('libs/umeng-analytics-v5.5.3.jar')
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta2'
+    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.lovedise:permissiongen:0.0.6'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.1'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.1'
+    compile 'io.reactivex:rxjava:1.1.2'
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+    compile 'fm.jiecao:jiecaovideoplayer:5.6'
+    compile 'com.github.barteksc:android-pdf-viewer:2.7.0-beta.1'
+    compile 'com.jakewharton:butterknife:8.7.0'
+    compile 'com.alibaba:fastjson:1.2.10'
+    //PushSDK必须依赖基础组件库，所以需要加入对应依赖
+    compile 'com.umeng.sdk:common:1.5.3'
+    //PushSDK必须依赖utdid库，所以需要加入对应依赖
+    compile 'com.umeng.sdk:utdid:1.1.5.3'
+    compile group: 'com.tencent.mm.opensdk', name: 'wechat-sdk-android-with-mta', version: '5.1.4'
+    //PushSDK
+    compile 'com.umeng.sdk:push:4.2.0'
+    testCompile 'junit:junit:4.12'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+}
+
+
+def getDate() {
+    return new Date().format('yyyyMMdd')
+}
+
+
