@@ -32,8 +32,8 @@ public class C {
         public static final String home_url_normal = "http://webview.easyiservice.com:8080/";
         //macao
 //        public static final String home_url_macao = " http://h5ascott.easyiservice.com/";
-        public static final String home_url = home_url_normal;
-//                 public static final String home_url ="http://47.52.220.96:80";
+//        public static final String home_url = home_url_normal;
+                 public static final String home_url ="http://47.52.220.96:80";
         public static final String do_main = "https://service.easyiservice.com/";
         public static final String time_url = do_main + "system/getTime";
         public static final String secret_key = "CtUyV$8MGoK8u5L*P0Q50T/b8S9iclS*LQqo";

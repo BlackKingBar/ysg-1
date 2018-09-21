@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,6 +35,7 @@ import com.ysg.yashige.base.C;
 import com.ysg.yashige.base.MyApplication;
 import com.ysg.yashige.utils.LoadingDialog;
 import com.ysg.yashige.utils.LogUtils;
+import com.ysg.yashige.utils.SharePreUtil;
 import com.ysg.yashige.utils.Toastutils;
 
 import java.io.File;
@@ -247,6 +250,13 @@ public abstract class WebPageActivity extends BaseActivity {
         customView = null;
         customViewCallback.onCustomViewHidden();
         webView.setVisibility(View.VISIBLE);
+    }
+
+    public void testClick(View view) {
+        LogUtils.i("testClick");
+        LoadingDialog.getInstance(this).showDialog();
+        webView.clearCache(true);
+        webView.loadUrl(C.network.home_url);
     }
 
     /**

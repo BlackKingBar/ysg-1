@@ -35,6 +35,7 @@ import com.ysg.yashige.networks.model.VersionModel;
 import com.ysg.yashige.utils.CheckVersionUtil;
 import com.ysg.yashige.utils.JumpItent;
 import com.ysg.yashige.utils.KeyBoardListener;
+import com.ysg.yashige.utils.LoadingDialog;
 import com.ysg.yashige.utils.LogUtils;
 import com.ysg.yashige.utils.SharePreUtil;
 import com.ysg.yashige.utils.Toastutils;
@@ -303,7 +304,7 @@ public class MainActivity extends WebPageActivity {
 
         @JavascriptInterface
         public void launchMiniProgramme(String paramsJson) {
-            Log.e(TAG, "launchMiniProgramme paramsJson " + paramsJson);
+           Log.e(TAG, "launchMiniProgramme paramsJson " + paramsJson);
             goLaunchMiniProgramme(paramsJson);
         }
 
@@ -351,6 +352,27 @@ public class MainActivity extends WebPageActivity {
         @JavascriptInterface
         public void checkVersion(String modelJson) {
             reminderUpdate(modelJson);
+        }
+
+        //h5 通知客户端 h5的版本
+        @JavascriptInterface
+        public void h5Version(String h5Version, String timestamp) {
+            LogUtils.w("JavascriptInterface.method.h5Version h5Version: "+h5Version+" timestamp: "+timestamp);
+
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    String lastH5Version = SharePreUtil.getInstance().getString("h5version");
+                    SharePreUtil.getInstance().putString("h5version", h5Version);
+                    if (!TextUtils.equals(lastH5Version, h5Version)) {
+                        LogUtils.w("版本更新 lastH5Version "+lastH5Version +" newversion "+h5Version);
+                        LoadingDialog.getInstance(MainActivity.this).showDialog();
+                        webView.clearCache(true);
+                        webView.loadUrl(C.network.home_url);
+                    }
+                }
+            });
+
         }
     }
 
