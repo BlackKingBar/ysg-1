@@ -19,6 +19,8 @@
 #import "YXOpenMap.h"
 #import "YXLocationManager.h"
 #import "AppDelegate.h"
+#import "WXApi.h"
+
 @protocol JSIneract <JSExport>
 JSExportAs(request,
            - (NSString *)paramName:(NSDictionary *)paramDict
@@ -32,6 +34,7 @@ JSExportAs(request,
 - (void)openSafariUrl:(NSString *)url;
 - (void)removeAllTagAlias:(NSDictionary *)dict;
 - (void)saveJSInfo:(NSDictionary *)dict;
+- (void)launchMiniProgramme:(NSDictionary *)dict;
 
 @end
 
@@ -87,6 +90,7 @@ JSExportAs(request,
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
     self.isLoading = false;
     [self dismissMessage];
+    [self startLoginRequest];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
@@ -208,11 +212,39 @@ JSExportAs(request,
     [self presentViewController:alertVC animated:YES completion:nil];
 }
 
+/**
+ 打开小程序
+ */
+- (void)launchMiniProgramme:(NSDictionary *)dic
+{
+    if (dic) {
+        WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];
+        launchMiniProgramReq.userName = @"gh_ed26ff61e540";
+        launchMiniProgramReq.miniProgramType = WXMiniProgramTypeRelease;
+        //        launchMiniProgramReq.path = [NSString stringWithFormat:@"pages/index/index?storeId=%@&roomId=%@&name=%@&date=%@&verifyCode=%@",dic[@"storeId"],dic[@"roomId"],dic[@"name"],dic[@"date"],dic[@"verifyCode"]];
+        NSString * tempStr =[NSString stringWithFormat:@"pages/index/index?storeId=%@&roomId=%@&name=%@&date=%@&verifyCode=%@",dic[@"storeId"],dic[@"roomId"],dic[@"name"],dic[@"date"],dic[@"verifyCode"]];
+        //        if ([[[UIDevice currentDevice] systemVersion] floatValue]>8.0) {
+        //            tempStr=[tempStr stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        //        } else {
+        //            tempStr=[tempStr stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        //        }
+        launchMiniProgramReq.path=tempStr;
+        [WXApi sendReq:launchMiniProgramReq];
+        [WXApi sendReq:launchMiniProgramReq];
+    }
+    return;
+}
+
 #pragma mark OC调用js
 
 - (void)setLocationLat:(NSString *)lat Ing:(NSString *)ing{
     NSString *jsStr = [NSString stringWithFormat:@"setLocationLat('%@','%@')",lat,ing];
     [self.context evaluateScript:jsStr];
+}
+
+- (void)startLoginRequest
+{
+    [self.context evaluateScript:@"startLogin()"];
 }
 
 - (void)didReceiveMemoryWarning {

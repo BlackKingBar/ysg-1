@@ -11,4 +11,5 @@ pod 'jastor', '~> 0.2.1'
     pod 'MBProgressHUD', '~> 0.9.1'
     pod 'WebViewJavascriptBridge', '~> 5.0'
     pod 'SDWebImage'
+    pod 'WechatOpenSDK'
 end

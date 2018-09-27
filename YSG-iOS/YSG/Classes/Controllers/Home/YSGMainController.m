@@ -24,6 +24,8 @@
 #import "JSInterface+YSG.h"
 #import "AppDelegate.h"
 #import "YSGPDFVideoController.h"
+#import "WXApi.h"
+
 @interface YSGMainController()<WKUIDelegate,WKNavigationDelegate,WKScriptMessageHandler,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 @property (strong, nonatomic) WKWebView *webView;
 @property (nonatomic,strong) NSString  *publicTime;
@@ -74,6 +76,8 @@
     [userContentController addScriptMessageHandler:self name:@"removeAllTagAlias"];
     [userContentController addScriptMessageHandler:self name:@"openFile"];
     [userContentController addScriptMessageHandler:self name:@"openSafariUrl"];
+    [userContentController addScriptMessageHandler:self name:@"launchMiniProgramme"];
+    [userContentController addScriptMessageHandler:self name:@"h5Version"];
     
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.userContentController = userContentController;
@@ -162,6 +166,12 @@
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation{
     self.isLoading = false;
     [self dismissMessage];
+    [self startLoginRequest];
+    //    WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];
+    //    launchMiniProgramReq.userName = @"gh_ed26ff61e540";
+    //    launchMiniProgramReq.path = @"pages/index/index?storeId=5b8dea81d3adec2cf44f43c8&roomId=702&name=wang&date=2018-09-08&verifyCode=34fdace8190f962e96bdc19002bc0e9d";
+    //    launchMiniProgramReq.miniProgramType = WXMiniProgramTypeRelease;
+    //    [WXApi sendReq:launchMiniProgramReq];
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation{
@@ -302,6 +312,53 @@
     [self presentViewController:alertVC animated:YES completion:nil];
 }
 
+/**
+ 打开小程序
+ */
+- (void)launchMiniProgramme:(NSDictionary *)dic
+{
+    if (dic) {
+        WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];
+        launchMiniProgramReq.userName = @"gh_ed26ff61e540";
+        launchMiniProgramReq.miniProgramType = WXMiniProgramTypeRelease;
+        //        launchMiniProgramReq.path = [NSString stringWithFormat:@"pages/index/index?storeId=%@&roomId=%@&name=%@&date=%@&verifyCode=%@",dic[@"storeId"],dic[@"roomId"],dic[@"name"],dic[@"date"],dic[@"verifyCode"]];
+        NSString * tempStr =[NSString stringWithFormat:@"pages/index/index?storeId=%@&roomId=%@&name=%@&date=%@&verifyCode=%@",dic[@"storeId"],dic[@"roomId"],dic[@"name"],dic[@"date"],dic[@"verifyCode"]];
+        //        if ([[[UIDevice currentDevice] systemVersion] floatValue]>8.0) {
+        //           tempStr=[tempStr stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        //        } else {
+        //            tempStr=[tempStr stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        //        }
+        launchMiniProgramReq.path=tempStr;
+        [WXApi sendReq:launchMiniProgramReq];
+    }
+    return;
+    //    WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];
+    //    launchMiniProgramReq.userName = @"gh_ed26ff61e540";
+    //    launchMiniProgramReq.path = @"pages/index/index?storeId=5b8dea81d3adec2cf44f43c8&roomId=702&name=wang&date=2018-09-08&verifyCode=34fdace8190f962e96bdc19002bc0e9d";
+    //    launchMiniProgramReq.miniProgramType = WXMiniProgramTypeRelease;
+    //    [WXApi sendReq:launchMiniProgramReq];
+}
+
+- (void)h5Version:(NSDictionary *)dic
+{
+    NSLog(@"dic=%@",dic);
+    
+    NSString * version = [[NSUserDefaults standardUserDefaults] valueForKey:@"version"];
+    if ([dic[@"version"] isKindOfClass:[NSString class]]&&[version isKindOfClass:[NSString class]]) {
+        if (![version isEqual:dic[@"version"]]) {
+            [self clearAllUIWebViewData];
+            [[NSUserDefaults standardUserDefaults] setValue:dic[@"version"] forKey:@"version"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
+    
+    if ([dic[@"version"] isKindOfClass:[NSString class]]) {
+        [[NSUserDefaults standardUserDefaults] setValue:dic[@"version"] forKey:@"version"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    
+}
 
 #pragma mark OC调用js
 
@@ -313,6 +370,16 @@
         }
     }];
 }
+
+- (void)startLoginRequest
+{
+    [self.webView evaluateJavaScript:@"startLogin()" completionHandler:^(id _Nullable data, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"错误:%@", error.localizedDescription);
+        }
+    }];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -337,6 +404,25 @@
     }
 }
 
+#pragma -mark 清除缓存
 
+- (void)clearAllUIWebViewData {
+    // Clear the webview cache...
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+    [self removeApplicationLibraryDirectoryWithDirectory:@"Caches"];
+    [self removeApplicationLibraryDirectoryWithDirectory:@"WebKit"];
+    // Empty the cookie jar...
+    //    for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+    //        [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
+    //    }
+    //    [self removeApplicationLibraryDirectoryWithDirectory:@"Cookies"];
+}
+
+- (void)removeApplicationLibraryDirectoryWithDirectory:(NSString *)dirName {
+    NSString *dir = [[[[NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSUserDomainMask, YES) lastObject]stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:dirName];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:dir]) {
+        [[NSFileManager defaultManager] removeItemAtPath:dir error:nil];
+    }
+}
 
 @end
